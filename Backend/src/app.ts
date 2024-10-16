@@ -2,7 +2,7 @@ import express from "express";
 import * as dotevnv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import { generateResponse } from "./routes/gemini";
+import { promptToGemini } from "./routes/gemini";
 
 dotevnv.config();
 
@@ -27,4 +27,8 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-app.post("/generate", generateResponse);
+app.post("/generate/prompt", async (req, res) => {
+  const prompt = req.body.prompt;
+  const geminiResult = await promptToGemini(prompt, false);
+  res.send(geminiResult);
+});

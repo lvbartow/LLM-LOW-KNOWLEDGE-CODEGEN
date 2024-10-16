@@ -13,15 +13,17 @@ const configuration = new GoogleGenerativeAI(
 const modelId = "gemini-pro";
 const model = configuration.getGenerativeModel({ model: modelId });
 
-//These arrays are to maintain the history of the conversation
 const conversationContext: Content[] = [];
 const currentMessages: Content[] = [];
 
-// Controller function to handle chat conversation
-export const generateResponse = async (req: Request, res: Response) => {
+export const promptToGemini = async (
+  prompt: string,
+  emptyConversationContext: boolean
+) => {
   try {
-    const { prompt } = req.body;
-
+    if (emptyConversationContext) {
+      conversationContext.length = 0;
+    }
     // Restore the previous context
     for (const message of conversationContext) {
       currentMessages.push(message);
@@ -45,9 +47,9 @@ export const generateResponse = async (req: Request, res: Response) => {
       parts: [{ text: responseText }],
     });
 
-    res.send({ response: responseText });
+    return responseText;
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+    return err;
   }
 };
