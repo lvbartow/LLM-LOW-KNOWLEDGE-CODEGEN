@@ -2,7 +2,7 @@ import express from "express";
 import * as dotevnv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import { promptToGemini } from "./routes/gemini";
+import { promptToGemini } from "./llm/testgemini";
 
 dotevnv.config();
 
