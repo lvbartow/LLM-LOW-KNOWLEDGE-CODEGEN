@@ -1,6 +1,4 @@
-export const selectBaselineCoTTemplate = (formatInstructions: String, viewDescription: String,
-                                          meta1: String, meta2: String, join: String): String => {
-    return `You specialize in reasoning about PlantUML metamodels, particularly in selecting and filtering each class's attributes.
+export const selectBaselineCoTTemplate : string = `You specialize in reasoning about PlantUML metamodels, particularly in selecting and filtering each class's attributes.
 
 # TASK
 Given two metamodels, a view description, and a list of relations containing class pairs, your task is to select a set of attributes for the metamodels' classes.
@@ -23,7 +21,7 @@ You may assume the following template for the input relations list:
 }
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the response, follow these rules:
@@ -41,12 +39,12 @@ When generating the response, follow these rules:
 8. Provide the final answer as valid JSON only. Exclude any explanations or delimiters.
 
 # INPUT
-View description: ${viewDescription}
-Metamodel 1: ${meta1}
-Metamodel 2: ${meta2}
-List of relations: ${join}
-Select elements:`;
-}
+View description: {viewDescription}
+Metamodel 1: {meta1}
+Metamodel 2: {meta2}
+List of relations: {join}
+Select elements:`
+
 
 export const selectFewShotCoTTemplate = (formatInstructions: String) : String => {
     return `You specialize in reasoning about PlantUML metamodels, particularly in selecting and filtering each class's attributes.
@@ -72,7 +70,7 @@ You may assume the following template for the input relations list:
 }
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the response, follow these rules:

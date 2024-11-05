@@ -1,13 +1,12 @@
-export const joinBaselineCoTTemplate = (formatInstructions: String, viewDescription: String,
-                                 meta1: String, meta2: String): String => {
-    return `You are now a PlantUML analyst tasked with finding relationships between classes from two metamodels.
+export const joinBaselineCoTTemplate : string =
+     `You are now a PlantUML analyst tasked with finding relationships between classes from two metamodels.
 
 # TASK
 Analyze the input metamodels and the view description to define a list of relations between the metamodels' classes. 
 Each relation must combine one class from the first metamodel with one from the second metamodel. Classes can be paired when they represent the same domain object, are complementary, or when the view description specifies attributes from one metamodel to appear in the other.
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the JSON response, follow these rules:
@@ -27,11 +26,10 @@ When generating the JSON response, follow these rules:
 10. Provide only the valid JSON response without any explanation or delimiters.
 
 # INPUT
-View description: ${viewDescription}
-Metamodel 1: ${meta1}
-Metamodel 2: ${meta2}
+View description: {viewDescription}
+Metamodel 1: {meta1}
+Metamodel 2: {meta2}
 Relations:`
-}
 
 //FewShot = consiste à montrer au modèle quelques exemples (appelés "shots" en anglais) de ce que vous voulez qu'il fasse
 export const joinFewShotCoTTemplate = (formatInstructions: String) : String => {
@@ -50,7 +48,7 @@ Each relation always contains precisely one class from each metamodel.
 In your response, the classes are always in order: the first class comes from the first metamodel, and the second class comes from the second metamodel.
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the JSON response, you should follow these rules:

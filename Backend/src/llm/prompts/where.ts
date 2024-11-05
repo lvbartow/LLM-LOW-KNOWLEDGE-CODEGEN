@@ -1,6 +1,5 @@
-export const whereBaselineCoTTemplate = (formatInstructions: String,
-                                         viewDescription: String, meta1: String, meta2: String, join: String): String => {
-    return `You specialize in reasoning on PlantUML metamodels, especially combining and merging them.
+export const whereBaselineCoTTemplate : string =
+    `You specialize in reasoning on PlantUML metamodels, especially combining and merging them.
 
 # TASK
 Given two metamodels, a list of relations containing class pairs, and a view description, your task is to define how to combine the given classes.
@@ -19,7 +18,7 @@ The input relations list will be in the following format:
 }
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the response text, follow these rules:
@@ -36,13 +35,11 @@ When generating the response text, follow these rules:
 Your output should contain only the valid JSON and nothing else. Exclude any explanation or delimiter from the final response.
 
 # INPUT
-View description: ${viewDescription}
-Metamodel 1: ${meta1}
-Metamodel 2: ${meta2}
-List of relations: ${join}
+View description: {viewDescription}
+Metamodel 1: {meta1}
+Metamodel 2: {meta2}
+List of relations: {join}
 Combination rules:`;
-    ;
-}
 
 export const whereFewShotCoTTemplate = (formatInstructions: String) : String => {
     return `You specialize in reasoning on PlantUML metamodels, especially combining and merging them.
@@ -64,7 +61,7 @@ The input relations list will be in the following format:
 }
 
 # OUTPUT DATA FORMAT
-${formatInstructions}
+{formatInstructions}
 
 # RULES
 When generating the response text, follow these rules:
