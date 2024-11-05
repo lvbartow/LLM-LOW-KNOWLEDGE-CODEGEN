@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 20px;
+}
+
+.smallBox {
+    flex: 1;
+    padding: 20px;
+    height: 25vh;
+    border-radius: 8px;
+    background-color: #fafafa;
+    text-align: left;
+    border: 1px solid #ddd;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    cursor: pointer;
+}
+
+.button {
+    padding: 14px 24px;
+    height: fit-content;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.bigBox {
+    width: 90%;
+    height: 35vh;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fafafa;
+    text-align: left;
+    border: 1px solid #ddd;
+    margin: 20px;
+    cursor: pointer;
+}
