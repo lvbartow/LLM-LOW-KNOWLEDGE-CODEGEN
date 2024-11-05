@@ -1,4 +1,4 @@
 enum LlmEnum {
-    OPENAI = "OpenAI",
+    OPENAI = "OPENAI",
     GEMINI = "GEMINI"
 }

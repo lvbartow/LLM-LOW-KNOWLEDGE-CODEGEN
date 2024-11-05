@@ -5,16 +5,23 @@ class LlmConfig {
 
     llmType: LlmEnum; //GEMINI ou OPENAI
     model: LlmBase;
+    temperature: number;
 
-    constructor(llmType: LlmEnum) {
+
+    constructor(llmType: LlmEnum, temperature: number) {
         this.llmType = llmType;
-        if(llmType === LlmEnum.GEMINI){
+        this.temperature = temperature;
+    }
+
+    init(): any {
+        if(this.llmType === LlmEnum.GEMINI){
             this.model = new Gemini();
         }
         else{
             this.model = new OpenAi();
         }
-        this.model.init();
+        this.model.init(this.temperature);
+
     }
 
 }

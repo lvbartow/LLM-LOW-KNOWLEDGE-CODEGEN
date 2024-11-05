@@ -6,8 +6,9 @@ abstract class LlmBase {
     abstract process(): string;
 
     //Initialisation du modele
-    abstract init(): boolean;
+    abstract init(temperature: number): boolean;
 
+    
 
 
 }
