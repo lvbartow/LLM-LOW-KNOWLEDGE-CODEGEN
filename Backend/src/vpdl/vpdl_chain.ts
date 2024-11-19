@@ -1,7 +1,8 @@
 import {SelectRun} from "~/runnables/select_run";
 import {JoinRun} from "~/runnables/join_run";
 import {WhereRun} from "~/runnables/where_run";
-import {RunnableLambda, RunnablePassthrough} from "@langchain/core/runnables";
+import {RunnableBinding, RunnableLambda, RunnablePassthrough} from "@langchain/core/runnables";
+import { LlmBase } from "~/llm/model/llmBase";
 
 export interface VPDLInput {
     meta_1_path: string;
@@ -31,13 +32,15 @@ export interface VPDLInput {
 
 export class VPDLChain {
 
-    generateVpdlSkeletonWrapper(input: VPDLInput): string {
-        return this.generateVpdlSkeleton(input, input.meta_1_path, input.meta_2_path);
+    static async generateVpdlSkeletonWrapper(input: VPDLInput): Promise<string>{
+        return VPDLChain.generateVpdlSkeleton(input, input.meta_1_path, input.meta_2_path);
     }
 
-    generateVpdlSkeleton(inputVpdl: VPDLInput, meta1: string, meta2: string): string {
-        const [meta1Uri, meta1Prefix] = ecoreParser.getMetamodelUri(meta1);
-        const [meta2Uri, meta2Prefix] = ecoreParser.getMetamodelUri(meta2);
+    static generateVpdlSkeleton(inputVpdl: VPDLInput, meta1: string, meta2: string): string {
+        // const [meta1Uri, meta1Prefix] = ecoreParser.getMetamodelUri(meta1);
+        // const [meta2Uri, meta2Prefix] = ecoreParser.getMetamodelUri(meta2);
+        const [meta1Uri, meta1Prefix] = '';
+        const [meta2Uri, meta2Prefix] = '';
 
         let vpdlSkeleton = "create view NAME as\n\nselect ";
 
@@ -73,51 +76,77 @@ export class VPDLChain {
     }
 
     //this.llm, this.viewDescription, this.ecoreFilesPaths[0], this.ecoreFilesPaths[1], "baseline"
-    static executeVPDLChain(llm: LlmBase, viewDesc: String, meta1Path: string, meta2Path: String, promptType: string): any {
+    static async executeVPDLChain(
+        llm: LlmBase,
+        viewDesc: string,
+        meta1Path: string,
+        meta2Path: string,
+        promptType: string
+    ): Promise<any> {
 
-        //TODO : load ecore files to get content directly from files
-        const meta1: string = ""
-        const meta2: string = ""
+        // Simule le chargement des fichiers ecore
+        const meta1: string = "";  // Charger le contenu de meta1 ici
+        const meta2: string = "";  // Charger le contenu de meta2 ici
 
-        //Join
+        // JOIN
         const joinRunnable = new JoinRun(llm);
         joinRunnable.setPrompt();
-        const joinChain = joinRunnable.getRunnable()
-        //Select
+        const joinChain = joinRunnable.getRunnable();
+
+        // SELECT
         const selectRunnable = new SelectRun(llm);
         selectRunnable.setPrompt();
         const selectChain = selectRunnable.getRunnable();
-        //Where
+
+        // WHERE
         const whereRunnable = new WhereRun(llm);
         whereRunnable.setPrompt();
         const whereChain = whereRunnable.getRunnable();
 
+        // Construction de la chaîne
+        const {generateVpdlSkeletonWrapper: generateVpdlSkeletonWrapper1} = VPDLChain;
+
+
         const fullChain = RunnablePassthrough.assign({
             join: joinChain
-        }).withConfig({runName: "JOIN"}).pipe(
-            new RunnablePassthrough().assign({
-                meta_1: meta1,
-                meta_2: meta2,
-                meta_1_path: meta1Path,
-                meta_2_path: meta2Path,
-                view_description: viewDesc,
-                join: joinChain
-            }).withConfig({runName: "META_SETUP"}) // Ajout d'une étape intermédiaire pour configurer les métadonnées
-        )
+        }).withConfig({ runName: "JOIN" })
+        //     .assign({
+        //     meta1: meta1,
+        //     meta2: meta2,
+        //     meta_1_path: meta1Path,
+        //     meta_2_path: meta2Path,
+        //     viewDescription: viewDesc,
+        //     join: joinChain
+        // })
             .pipe(
                 new RunnablePassthrough().assign({select: selectChain})
                     .withConfig({runName: "SELECT"})
             )
             .pipe(
-                new RunnablePassthrough().assign({where: whereChain})
-                    .withConfig({runName: "WHERE"})
-            )
-            .pipe(
                 new RunnablePassthrough().assign({
-                    vpdl_draft: new RunnableLambda(() => this.generateVpdlSkeletonWrapper()) // Si 'generateVpdlSkeletonWrapper' est une fonction asynchrone
-                })
-                    .withConfig({runName: "VPDL_DRAFT"})
-            );
+                    where: whereChain
+                }).withConfig({ runName: "WHERE" })
+            )
+            // .pipe(
+            //     new RunnablePassthrough().assign({
+            //         // @ts-ignore
+            //         vpdl_draft: new RunnableLambda(VPDLChain.generateVpdlSkeletonWrapper)
+            //     }).withConfig({ runName: "VPDL_DRAFT" })
+            // );
+
+        // Exécution de la chaîne
+        const fullResult = await fullChain.invoke({
+            meta1: meta1,
+            meta2: meta2,
+            meta_1_path: meta1Path,
+            meta_2_path: meta2Path,
+            viewDescription: viewDesc,
+            context: null
+        });
+
+        console.log(fullResult);
     }
+
+
 
 }

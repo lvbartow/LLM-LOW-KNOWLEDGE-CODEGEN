@@ -1,5 +1,6 @@
 import {Gemini} from "~/llm/model/gemini";
 import {OpenAi} from "~/llm/model/openai";
+import {LlmBase} from "~/llm/model/llmBase";
 
 class LlmConfig {
 

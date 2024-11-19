@@ -1,3 +1,33 @@
+export const joinBaselineCoTTemplateFun = (formatInstructions: string, viewDescription: string,
+  meta1: string, meta2: string): string => {
+    return `You are now a PlantUML analyst tasked with finding relationships between classes from two metamodels.
+# TASK
+Analyze the input metamodels and the view description to define a list of relations between the metamodels' classes. 
+Each relation must combine one class from the first metamodel with one from the second metamodel. Classes can be paired when they represent the same domain object, are complementary, or when the view description specifies attributes from one metamodel to appear in the other.
+# OUTPUT DATA FORMAT
+${formatInstructions}
+# RULES
+When generating the JSON response, follow these rules:
+- Use only class names that exist in the metamodels. Do not include any classes that are not in the metamodels.
+- Ensure each relation's name is unique and meaningful.
+# STEP-BY-STEP PROCESS
+1. Identify all classes from the first metamodel.
+2. Identify all classes from the second metamodel.
+3. Combine classes in pairs when they represent the same domain object in each metamodel.
+4. Combine classes in pairs when one class in the second metamodel can be complemented by a class in the first metamodel and vice-versa.
+5. Analyze the view description for other potential relations.
+6. Ensure each pair includes one class from each metamodel.
+7. Ensure each relation's name is unique and meaningful.
+8. Verify all classes exist in the PlantUML metamodels.
+9. Create a JSON array with the combination pairs.
+10. Provide only the valid JSON response without any explanation or delimiters.
+# INPUT
+View description: ${viewDescription}
+Metamodel 1: ${meta1}
+Metamodel 2: ${meta2}
+Relations:`
+}
+
 export const joinBaselineCoTTemplate : string =
      `You are now a PlantUML analyst tasked with finding relationships between classes from two metamodels.
 

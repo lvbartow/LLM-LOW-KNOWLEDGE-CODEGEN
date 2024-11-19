@@ -3,6 +3,8 @@ import * as dotevnv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import { promptToGemini } from "./llm/testgemini";
+import {Gemini} from "~/llm/model/gemini";
+import {VPDL} from "~/vpdl/vpdl";
 
 dotevnv.config();
 
@@ -26,6 +28,17 @@ app.listen(PORT, () => {
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
+
+app.get("/vpdl", (req, res) => {
+  const gemini = new Gemini();
+  const vpdl = new VPDL(gemini);
+  if (vpdl.runVPDL()){
+    res.send("OKKK")
+  }
+  else{
+    res.send("PASOK");
+  }
+})
 
 app.post("/generate/prompt", async (req, res) => {
   const prompt = req.body.prompt;

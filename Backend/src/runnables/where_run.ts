@@ -1,30 +1,43 @@
 import {selectBaselineCoTTemplate} from "~/llm/prompts/select";
-import { PromptTemplate } from "@langchain/core/prompts";
+import {PromptTemplate} from "@langchain/core/prompts";
 import {whereBaselineCoTTemplate} from "~/llm/prompts/where";
 import {Runnable} from "@langchain/core/runnables";
+import {LlmBase} from "~/llm/model/llmBase";
+import {ChatGoogleGenerativeAI} from "@langchain/google-genai";
 
 export class WhereRun {
 
-    promptTemplate : string
+    promptTemplate: string
     concretePrompt: PromptTemplate
     model: any
 
     constructor(llm: LlmBase) {
         this.promptTemplate = whereBaselineCoTTemplate
-        this.model = llm.concreteModel
+        // this.model = llm.concreteModel
+        this.model = new ChatGoogleGenerativeAI({
+            model: "gemini-1.5-pro",
+            temperature: 0,
+            maxRetries: 2
+        });
     }
 
     setPrompt(): void {
         this.concretePrompt = new PromptTemplate({
-                inputVariables: ["viewDesc", "meta1", "meta2", "join"],
-                template : this.promptTemplate
+                inputVariables: ["viewDescription", "meta1", "meta2", "join"],
+                template: this.promptTemplate,
                 // TODO : format instructions
-                // partialVariables: {"format_instructions", }
+                partialVariables: {
+                    "formatInstructions": 'The output should be formatted as a JSON instance that conforms to the JSON schema below.' +
+                        'As an example, for the schema {"properties": {"foo": {"title": "Foo", "description": "a list of strings", "type": "array", "items": {"type": "string"}}}, "required": ["foo"]}' +
+                        'the object {"foo": ["bar", "baz"]} is a well-formatted instance of the schema. The object {"properties": {"foo": ["bar", "baz"]}} is not well-formatted.' +
+                        'Here is the output schema: ' +
+                        '{"properties": {"foo": {"description": "a list of strings", "type": "array", "items": {"type": "string"}}}, "required": ["foo"]}'
+                }
             }
         )
     }
 
-    getRunnable(): Runnable<any, Exclude<unknown, Error>>{
+    getRunnable(): Runnable<any, Exclude<unknown, Error>> {
         const chain = this.concretePrompt.pipe(this.model);
         return chain;
     }

@@ -1,0 +1,19 @@
+@startuml
+package "Book" {
+class Book {
+        title: EString
+        authorName: EString
+
+}
+
+Book "chapters 0..*" *--> Chapter
+class Chapter {
+        title: EString
+        nbPages: EInt
+
+}
+
+}
+
+
+@enduml
