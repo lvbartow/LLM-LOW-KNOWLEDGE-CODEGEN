@@ -7,7 +7,7 @@ export abstract class LlmBase {
   //Initialisation du modele
   abstract init(temperature: number): boolean;
 
-  abstract executeChain(formatInstructions: String, viewDesc: string, meta1Path: string, meta2Path: string, promptType: string):  Promise<string>;
+  abstract executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string):  Promise<string>;
 
   abstract join(formatInstructions: String, viewDescription: String, meta1: String, meta2: String): Promise<string>;
 

@@ -1,3 +1,15 @@
+export const select_format_instructions = `
+The output should be formatted as a JSON instance that conforms to the JSON schema below.
+
+As an example, for the schema {{"properties": {{"foo": {{"title": "Foo", "description": "a list of strings", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of the schema. The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+
+Here is the output schema:
+\`\`\`
+{"properties": {"filters": {"title": "Filters", "description": "Dictionary of filters with the metamodel name as the key.", "type": "object", "additionalProperties": {"$ref": "#/definitions/MetamodelClasses"}}}, "required": ["filters"], "definitions": {"ClassAttributes": {"title": "ClassAttributes", "description": "List of class attributes", "type": "array", "items": {"type": "string"}}, "MetamodelClasses": {"title": "MetamodelClasses", "description": "Dictionary of classes with their attributes. The class name is the key.", "type": "object", "additionalProperties": {"$ref": "#/definitions/ClassAttributes"}}}}
+\`\`\`
+`
+
 export const selectBaselineCoTTemplateFun = (formatInstructions: string, viewDescription: string,
   meta1: string, meta2: string, join: string): string => {
     return `You specialize in reasoning about PlantUML metamodels, particularly in selecting and filtering each class's attributes.

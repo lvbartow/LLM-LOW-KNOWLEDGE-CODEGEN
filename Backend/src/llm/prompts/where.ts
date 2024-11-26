@@ -1,3 +1,15 @@
+export const where_format_instructions = `
+The output should be formatted as a JSON instance that conforms to the JSON schema below.
+
+As an example, for the schema {{"properties": {{"foo": {{"title": "Foo", "description": "a list of strings", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of the schema. The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+
+Here is the output schema:
+\`\`\`
+{"properties": {"rules": {"title": "Rules", "description": "List of rules for each relation", "type": "array", "items": {"$ref": "#/definitions/Rules"}}}, "required": ["rules"], "definitions": {"RuleElement": {"title": "RuleElement", "type": "object", "properties": {"metaclass_1": {"title": "Metaclass 1", "description": "Name of the metaclass from metamodel 1", "type": "string"}, "combination_rule": {"title": "Combination Rule", "description": "Combination rule string explaining how the classes can be logically connected according to the domain's semantics", "type": "string"}, "metaclass_2": {"title": "Metaclass 2", "description": "Name of the metaclass from metamodel 2", "type": "string"}}, "required": ["metaclass_1", "combination_rule", "metaclass_2"]}, "Rules": {"title": "Rules", "type": "object", "properties": {"name": {"title": "Name", "description": "Name of the relation", "type": "string"}, "rules": {"title": "Rules", "description": "List of rules", "type": "array", "items": {"$ref": "#/definitions/RuleElement"}}}, "required": ["name", "rules"]}}}
+\`\`\`
+`
+
 export const whereBaselineCoTTemplateFun = (formatInstructions: string,
   viewDescription: string, meta1: string, meta2: string, join: string): string => {
     return `You specialize in reasoning on PlantUML metamodels, especially combining and merging them.

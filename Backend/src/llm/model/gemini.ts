@@ -1,10 +1,9 @@
 import * as dotenv from "dotenv";
 import {ChatSession, GenerativeModel, GoogleGenerativeAI} from "@google/generative-ai";
 import {LlmBase} from "~/llm/model/llmBase";
-import {joinBaselineCoTTemplateFun} from "~/llm/prompts/join";
-import {selectBaselineCoTTemplateFun, selectFewShotCoTTemplate} from "~/llm/prompts/select";
-import {whereBaselineCoTTemplateFun} from "~/llm/prompts/where";
-import * as console from "node:console";
+import {join_format_instructions, joinBaselineCoTTemplateFun} from "~/llm/prompts/join";
+import {select_format_instructions, selectBaselineCoTTemplateFun, selectFewShotCoTTemplate} from "~/llm/prompts/select";
+import {where_format_instructions, whereBaselineCoTTemplateFun} from "~/llm/prompts/where";
 import {readFileSync} from "fs";
 import {resolve} from "path";
 
@@ -65,27 +64,21 @@ export class Gemini extends LlmBase {
         return "";
     }
 
-    async executeChain(formatInstructions: string, viewDesc: string, meta1Path: string, meta2Path: string, promptType: string): Promise<string> {
+    async executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string): Promise<string> {
         console.log("executeChain() Gemini");
 
-        // Simule le chargement des fichiers ecore
         const meta1: string = loadMetaSample(meta1Path);
-        console.log("meta1 : " + meta1)
         const meta2: string = loadMetaSample(meta2Path);
-        console.log("meta2 : " + meta2)
 
-        // Attendez le résultat de `join`
-        const joinResult: string = await this.join(formatInstructions, viewDesc, meta1, meta2);
+        const joinResult: string = await this.join(join_format_instructions, viewDesc, meta1, meta2);
         console.log("joinResult : " + joinResult);
 
-        // Passez le résultat de `join` à `select` et `where`
-        const selectResult: string = await this.select(formatInstructions, viewDesc, meta1, meta2, joinResult);
+        const selectResult: string = await this.select(select_format_instructions, viewDesc, meta1, meta2, joinResult);
         console.log("selectResult : " + selectResult);
 
-        const whereResult: string = await this.where(formatInstructions, viewDesc, meta1, meta2, joinResult);
+        const whereResult: string = await this.where(where_format_instructions, viewDesc, meta1, meta2, joinResult);
         console.log("whereResult : " + whereResult);
 
-        // Vous pouvez maintenant utiliser les résultats pour retourner une valeur
         return `Join: ${joinResult}, Select: ${selectResult}, Where: ${whereResult}`;
     }
 
