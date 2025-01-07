@@ -2,10 +2,11 @@ import * as dotenv from "dotenv";
 import {ChatSession, GenerativeModel, GoogleGenerativeAI} from "@google/generative-ai";
 import {LlmBase} from "~/llm/model/llmBase";
 import {join_format_instructions, joinBaselineCoTTemplateFun} from "~/llm/prompts/join";
-import {select_format_instructions, selectBaselineCoTTemplateFun, selectFewShotCoTTemplate} from "~/llm/prompts/select";
+import {select_format_instructions, selectBaselineCoTTemplateFun} from "~/llm/prompts/select";
 import {where_format_instructions, whereBaselineCoTTemplateFun} from "~/llm/prompts/where";
 import {readFileSync} from "fs";
 import {resolve} from "path";
+import {VPDLChain, VPDLInput} from "~/vpdl/vpdl_chain";
 
 function loadMetaSample(metaPath: string): string {
     const path : string = resolve(__dirname, metaPath)
@@ -79,7 +80,19 @@ export class Gemini extends LlmBase {
         const whereResult: string = await this.where(where_format_instructions, viewDesc, meta1, meta2, joinResult);
         console.log("whereResult : " + whereResult);
 
-        return `Join: ${joinResult}, Select: ${selectResult}, Where: ${whereResult}`;
+        const inputVpdl: VPDLInput = {
+            meta_1_path: meta1Path,
+            meta_2_path: meta2Path,
+            select: selectResult,
+            join: joinResult,
+            where: whereResult
+        };
+
+        const fullResult = VPDLChain.generateVpdlSkeleton(inputVpdl, meta1, meta2);
+
+        console.log("fullResult : " + fullResult);
+
+        return fullResult;
     }
 
     async join(formatInstructions: string, viewDescription: string, meta1: string, meta2: string): Promise<string> {

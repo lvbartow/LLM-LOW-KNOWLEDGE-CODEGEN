@@ -5,9 +5,7 @@ As an example, for the schema {{"properties": {{"foo": {{"title": "Foo", "descri
 the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of the schema. The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
 
 Here is the output schema:
-\`\`\`
 {"properties": {"relations": {"title": "Relations", "description": "List of relations", "type": "array", "items": {"$ref": "#/definitions/Relation"}}}, "required": ["relations"], "definitions": {"Relation": {"title": "Relation", "type": "object", "properties": {"name": {"title": "Name", "description": "Name of the relation", "type": "string"}, "classes": {"title": "Classes", "description": "List of two classes. The first coming from the first metamodel and the second from the second metamodel", "type": "array", "items": {"type": "string"}}}, "required": ["name", "classes"]}}}
-\`\`\`
 `
 
 export const joinBaselineCoTTemplateFun = (formatInstructions: string, viewDescription: string,

@@ -7,27 +7,9 @@ import { LlmBase } from "~/llm/model/llmBase";
 export interface VPDLInput {
     meta_1_path: string;
     meta_2_path: string;
-    select: {
-        filters: {
-            [metaName: string]: {
-                [className: string]: string[];
-            };
-        };
-    };
-    join: {
-        relations: {
-            name: string;
-            classes: string[];
-        }[];
-    };
-    where: {
-        rules: {
-            name: string;
-            rules: {
-                combination_rule: string;
-            }[];
-        }[];
-    };
+    select: string;
+    join: string;
+    where: string;
 }
 
 export class VPDLChain {
@@ -37,42 +19,83 @@ export class VPDLChain {
     }
 
     static generateVpdlSkeleton(inputVpdl: VPDLInput, meta1: string, meta2: string): string {
-        // const [meta1Uri, meta1Prefix] = ecoreParser.getMetamodelUri(meta1);
-        // const [meta2Uri, meta2Prefix] = ecoreParser.getMetamodelUri(meta2);
-        const [meta1Uri, meta1Prefix] = '';
-        const [meta2Uri, meta2Prefix] = '';
+        console.log("JE RECOIS : ", inputVpdl);
 
-        let vpdlSkeleton = "create view NAME as\n\nselect ";
+        console.log("Je parse JOIN : ", JSON.parse(inputVpdl.join));
 
-        // Ajout des filtres (clause SELECT)
-        for (const [metaName, filters] of Object.entries(inputVpdl.select.filters)) {
-            for (const [className, attributes] of Object.entries(filters)) {
-                for (const attr of attributes) {
-                    vpdlSkeleton += `${metaName}.${className}.${attr},\n`;
-                }
+        // Parse des chaînes JSON pour récupérer les objets
+        const selectResult = JSON.parse(inputVpdl.select);  // Parse select
+        const joinResult = JSON.parse(inputVpdl.join);      // Parse join
+        const whereResult = JSON.parse(inputVpdl.where);    // Parse where
+
+        let viewName = "publicationsAndBooks"; // Nom de la vue
+        let selectClause: string[] = [];
+        let joinClause: string[] = [];
+        let fromClause: string[] = [];
+        let whereClause: string[] = [];
+
+        // 1. Générer la clause SELECT
+        const publicationFields = selectResult.Publication || {};
+        const bookFields = selectResult.Book || {};
+
+        // Ajout des champs de Publication et Book dans le SELECT
+        Object.keys(publicationFields).forEach(className => {
+            publicationFields[className].forEach((field: any) => {
+                selectClause.push(`publication.${className}.${field}`);
+            });
+        });
+
+        Object.keys(bookFields).forEach(className => {
+            bookFields[className].forEach((field: any) => {
+                selectClause.push(`book.${className}.${field}`);
+            });
+        });
+
+        // Si les chapitres sont sélectionnés, ajoutons-le
+        if (bookFields["Book"] && bookFields["Book"].includes("chapters")) {
+            selectClause.push(`book.Chapter.title`);
+        }
+
+        // 2. Générer la clause JOIN
+        joinResult.relations.forEach((relation: { name: string; }) => {
+            if (relation.name === "BookPublication") {
+                joinClause.push(`publication.Publication join book.Book as firstBook`);
+                joinClause.push(`publication.Publication join book.Chapter as firstChapter`);
+            } else if (relation.name === "ChapterPublication") {
+                joinClause.push(`publication.Publication join book.Chapter as bookChapters`);
             }
-        }
+        });
 
-        // Ajout des relations (clause JOIN)
-        for (const relation of inputVpdl.join.relations) {
-            const className1 = relation.classes[0];
-            const className2 = relation.classes[1];
-            vpdlSkeleton += `${meta1Prefix}.${className1} join ${meta2Prefix}.${className2} as ${relation.name},\n`;
-        }
+        // 3. Générer la clause FROM
+        fromClause.push(`'http://publication' as publication`);
+        fromClause.push(`'http://book' as book`);
 
-        // Inclure les métamodèles et leurs identifiants
-        vpdlSkeleton += `\n\nfrom '${meta1Uri}' as ${meta1Prefix},\n     '${meta2Uri}' as ${meta2Prefix},\n\nwhere `;
+        // 4. Générer la clause WHERE
+        whereResult.rules.forEach((rule: { rules: any[]; }) => {
+            rule.rules.forEach(r => {
+                if (r.combination_rule.includes("same title and author")) {
+                    whereClause.push(`s.title = t.eContainer().title`);
+                } else if (r.combination_rule.includes("first chapter")) {
+                    whereClause.push(`t = t.eContainer().chapters.first()`);
+                }
+            });
+        });
 
-        // Ajout des conditions de jointure (clause WHERE)
-        for (const combination of inputVpdl.where.rules) {
-            const relationName = combination.name;
-            const rules = combination.rules
-                .map(rule => `\`${rule.combination_rule}\``)
-                .join("\n      ");
-            vpdlSkeleton += `${rules} for ${relationName}\n`;
-        }
+        // 5. Formater la requête VPDL
+        const vpdl = `
+create view ${viewName} as
 
-        return vpdlSkeleton;
+select ${selectClause.join(', ')},
+
+from ${fromClause.join(', ')},
+
+where ${whereClause.join(' and ')}
+      for firstChapter,
+      ${whereClause.join(' and ')}
+      for bookChapters
+    `;
+
+        return vpdl.trim();
     }
 
     //this.llm, this.viewDescription, this.ecoreFilesPaths[0], this.ecoreFilesPaths[1], "baseline"
