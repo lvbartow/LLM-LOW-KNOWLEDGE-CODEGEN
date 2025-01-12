@@ -1,2 +1,2 @@
-The Book metamodel has details about each chapter, while the Publication has more information about the publisher and publishing date.
-I want a view of my Publication that contains the information regarding the chapters, both all chapters of the book, but also the first chapter.
+These two metamodels represent collections of books, but they have a different level of detail. While the book metamodel details each chapter, the publication has more information about the publisher and publishing date.
+I want to select all the information regarding publications, but I also wish to access the book chapters through the publication.

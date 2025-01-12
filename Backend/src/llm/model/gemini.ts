@@ -53,12 +53,6 @@ export class Gemini extends LlmBase {
         }
         this.concreteModel = model;
         return true;
-        // Langchain --------------
-        // this.concreteModel = new ChatGoogleGenerativeAI({
-        //     model: "gemini-1.5-pro",
-        //     temperature: 0,
-        //     maxRetries: 2
-        // });
     }
 
     process(): string {

@@ -34,8 +34,6 @@ export class VPDL {
     public runVPDL(): boolean {
         if(this.plantUmlFilesPaths.length === 2) {
             this.llm.executeChain(this.viewDescription, this.plantUmlFilesPaths[0], this.plantUmlFilesPaths[1], "baseline");
-            // Lanchain
-            // VPDLChain.executeVPDLChain(this.llm, this.viewDescription, this.ecoreFilesPaths[0], this.ecoreFilesPaths[1], "baseline");
         }
         return true
     }
