@@ -4,25 +4,12 @@ import {LlmBase} from "~/llm/model/llmBase";
 import {join_format_instructions, joinBaselineCoTTemplateFun} from "~/llm/prompts/join";
 import {select_format_instructions, selectBaselineCoTTemplateFun} from "~/llm/prompts/select";
 import {where_format_instructions, whereBaselineCoTTemplateFun} from "~/llm/prompts/where";
-import {readFileSync} from "fs";
-import {resolve} from "path";
 import {VPDLChain, VPDLInput} from "~/vpdl/vpdl_chain";
-
-function loadMetaSample(metaPath: string): string {
-    const path : string = resolve(__dirname, metaPath)
-    try {
-        const data = readFileSync(path, 'utf-8');
-        return data;
-    } catch (error) {
-        console.error("Error reading the file:", error);
-        return "";
-    }
-}
+import {ModelsEnum} from "~/llm/model/modelsEnum";
 
 export class Gemini extends LlmBase {
 
     concreteModel: GenerativeModel;
-    temperature: number; //Avec Gemini la temp est à passer dans la requte et pas au moment de la configuration du model
 
     constructor() {
         super();
@@ -59,36 +46,6 @@ export class Gemini extends LlmBase {
         return "";
     }
 
-    async executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string): Promise<string> {
-        console.log("executeChain() Gemini");
-
-        const meta1: string = loadMetaSample(meta1Path);
-        const meta2: string = loadMetaSample(meta2Path);
-
-        const joinResult: string = await this.join(join_format_instructions, viewDesc, meta1, meta2);
-        console.log("joinResult : " + joinResult);
-
-        const selectResult: string = await this.select(select_format_instructions, viewDesc, meta1, meta2, joinResult);
-        console.log("selectResult : " + selectResult);
-
-        const whereResult: string = await this.where(where_format_instructions, viewDesc, meta1, meta2, joinResult);
-        console.log("whereResult : " + whereResult);
-
-        const inputVpdl: VPDLInput = {
-            meta_1_path: meta1Path,
-            meta_2_path: meta2Path,
-            select: selectResult,
-            join: joinResult,
-            where: whereResult
-        };
-
-        const fullResult = VPDLChain.generateVpdlSkeleton(inputVpdl, meta1, meta2);
-
-        console.log("fullResult : " + fullResult);
-
-        return fullResult;
-    }
-
     async join(formatInstructions: string, viewDescription: string, meta1: string, meta2: string): Promise<string> {
         console.log("join() Gemini");
 
@@ -117,6 +74,34 @@ export class Gemini extends LlmBase {
         const result = await chat.sendMessage(wherePrompt);
         const response = result.response;
         return response.text();
+    }
+
+    async executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string):  Promise<string> {
+        const meta1: string = this.loadMetaSample(meta1Path);
+        const meta2: string = this.loadMetaSample(meta2Path);
+
+        const joinResult: string = await this.join(join_format_instructions, viewDesc, meta1, meta2);
+        console.log("joinResult : " + joinResult);
+
+        const selectResult: string = await this.select(select_format_instructions, viewDesc, meta1, meta2, joinResult);
+        console.log("selectResult : " + selectResult);
+
+        const whereResult: string = await this.where(where_format_instructions, viewDesc, meta1, meta2, joinResult);
+        console.log("whereResult : " + whereResult);
+
+        const inputVpdl: VPDLInput = {
+            meta_1_path: meta1Path,
+            meta_2_path: meta2Path,
+            select: selectResult,
+            join: joinResult,
+            where: whereResult
+        };
+
+        const fullResult = VPDLChain.generateVpdlSkeleton(inputVpdl, meta1, meta2, ModelsEnum.GEMINI);
+
+        console.log("fullResult : " + fullResult);
+
+        return fullResult;
     }
 
 
