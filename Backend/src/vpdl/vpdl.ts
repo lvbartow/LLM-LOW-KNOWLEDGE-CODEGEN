@@ -7,12 +7,14 @@ export class VPDL {
     llm: LlmBase;
     viewDescription: string;
     plantUmlFilesPaths: string[];
+    temperature: number;
 
-    constructor(llm: LlmBase) {
+    constructor(llm: LlmBase, temperature: number) {
         this.llm = llm;
         this.plantUmlFilesPaths = [];
-        this.llm.init(0.95);
         this.initVPDL();
+        this.temperature = temperature;
+        this.llm.init(this.temperature);
     }
 
     private initVPDL(): void {
