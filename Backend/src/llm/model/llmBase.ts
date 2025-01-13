@@ -25,6 +25,6 @@ export abstract class LlmBase {
 
   abstract where(formatInstruction: string, viewDesc: string, meta1: string, meta2: string, join: string):  Promise<string>;
 
-  abstract executeChain(viewDesc: string, meta1: string, meta2: string, join: string): Promise<string>;
+  abstract executeChain(viewDesc: string, meta1: string, meta2: string, join: string, useSampleData: boolean): Promise<string>;
 
 }

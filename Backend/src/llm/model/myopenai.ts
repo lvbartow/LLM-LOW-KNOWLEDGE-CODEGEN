@@ -77,9 +77,9 @@ export class MyOpenAI extends LlmBase {
     return result ;
   }
 
-  async executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string):  Promise<string> {
-    const meta1: string = this.loadMetaSample(meta1Path);
-    const meta2: string = this.loadMetaSample(meta2Path);
+  async executeChain(viewDesc: string, meta1Path: string, meta2Path: string, promptType: string, useSampleData: boolean):  Promise<string> {
+    const meta1: string = (useSampleData) ? this.loadMetaSample(meta1Path) : meta1Path;
+    const meta2: string = (useSampleData) ? this.loadMetaSample(meta2Path) : meta2Path;
 
     const joinResult: string = await this.join(join_format_instructions, viewDesc, meta1, meta2);
     console.log("joinResult : " + joinResult);

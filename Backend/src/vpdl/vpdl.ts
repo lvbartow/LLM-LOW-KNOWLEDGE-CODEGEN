@@ -11,7 +11,7 @@ export class VPDL {
     constructor(llm: LlmBase) {
         this.llm = llm;
         this.plantUmlFilesPaths = [];
-        this.llm.init(0.8);
+        this.llm.init(0.95);
         this.initVPDL();
     }
 
@@ -34,10 +34,11 @@ export class VPDL {
         let chainResult = "";
 
         const viewDescriptionPath = userViewPath || this.loadViewDescription();
-        const plantUmlPaths = ecoreFiles.length > 0 ? ecoreFiles : this.plantUmlFilesPaths;
+        const dynamicFiles = ecoreFiles.length > 0;
 
-        if (plantUmlPaths.length === 2) {
-            chainResult = await this.llm.executeChain(viewDescriptionPath, plantUmlPaths[0], plantUmlPaths[1], "baseline");
+        if (ecoreFiles.length === 2 || this.plantUmlFilesPaths.length === 2) {
+            if (dynamicFiles) chainResult = await this.llm.executeChain(viewDescriptionPath, ecoreFiles[0], ecoreFiles[1], "baseline", false);
+            else chainResult = await this.llm.executeChain(viewDescriptionPath, this.plantUmlFilesPaths[0], this.plantUmlFilesPaths[1], "baseline", true);
         }
         return chainResult;
     }
