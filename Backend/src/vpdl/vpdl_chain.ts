@@ -1,3 +1,5 @@
+import {ModelsEnum} from "~/llm/model/modelsEnum";
+
 export interface VPDLInput {
     meta_1_path: string;
     meta_2_path: string;
@@ -8,9 +10,7 @@ export interface VPDLInput {
 
 export class VPDLChain {
 
-    static generateVpdlSkeleton(inputVpdl: VPDLInput, meta1: string, meta2: string): string {
-        // console.log("JE RECOIS : ", inputVpdl);
-        // console.log("Je parse JOIN : ", JSON.parse(inputVpdl.join));
+    static generateVpdlSkeleton(inputVpdl: VPDLInput, meta1: string, meta2: string, inputModel : ModelsEnum): string {
 
         // Parse des chaînes JSON pour récupérer les objets
         const selectResult = JSON.parse(inputVpdl.select);  // Parse select
@@ -23,10 +23,22 @@ export class VPDLChain {
         let whereClause: string[] = [];
 
         // 1. Générer la clause SELECT
-        for (const [key, value] of Object.entries(selectResult.filters)) {
-            fromClause.push(`'http://${key.toLowerCase()}' as ${key.toLowerCase()}\n`); //Generation de la clause from
-            for (const item of value as string[]) {
-                selectClause.push(`${key.toLowerCase()}.${key}.${item}\n`);
+        if (inputModel === ModelsEnum.OPENAI) {
+            for (const [key, value] of Object.entries(selectResult.filters)) {
+                for (const [childKey, childValue] of Object.entries(value as object)) {
+                    if(!fromClause.includes(`'http://${key.toLowerCase()}' as ${key.toLowerCase()}\n`)) fromClause.push(`'http://${key.toLowerCase()}' as ${key.toLowerCase()}\n`); //Generation de la clause from
+                    for (const item of childValue as string[]) {
+                        selectClause.push(`${key.toLowerCase()}.${childKey}.${item}\n`);
+                    }
+                }
+            }
+        }
+        else if (inputModel === ModelsEnum.GEMINI) {
+            for (const [key, value] of Object.entries(selectResult.filters)) {
+                fromClause.push(`'http://${key.toLowerCase()}' as ${key.toLowerCase()}\n`); //Generation de la clause from
+                for (const item of value as string[]) {
+                    selectClause.push(`${key.toLowerCase()}.${key}.${item}\n`);
+                }
             }
         }
 

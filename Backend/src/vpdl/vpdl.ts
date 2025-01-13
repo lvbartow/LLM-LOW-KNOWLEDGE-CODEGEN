@@ -11,7 +11,7 @@ export class VPDL {
     constructor(llm: LlmBase) {
         this.llm = llm;
         this.plantUmlFilesPaths = [];
-        this.llm.init(0.2)
+        this.llm.init(0.8);
         this.initVPDL();
     }
 
