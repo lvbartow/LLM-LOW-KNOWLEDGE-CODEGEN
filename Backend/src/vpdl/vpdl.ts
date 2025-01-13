@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import { resolve } from "path";
+import {readFileSync} from "fs";
+import {resolve} from "path";
 import {LlmBase} from "~/llm/model/llmBase";
 
 export class VPDL {
@@ -23,18 +23,22 @@ export class VPDL {
     private loadViewDescription(): string {
         const viewDescFilePath = resolve(__dirname, "../../SampleData/view_description.txt");
         try {
-            const data = readFileSync(viewDescFilePath, 'utf-8');
-            return data;
+            return readFileSync(viewDescFilePath, 'utf-8');
         } catch (error) {
             console.error("Error reading the file:", error);
             return "";
         }
     }
 
-    public runVPDL(): boolean {
-        if(this.plantUmlFilesPaths.length === 2) {
-            this.llm.executeChain(this.viewDescription, this.plantUmlFilesPaths[0], this.plantUmlFilesPaths[1], "baseline");
+    public async runVPDL(userViewPath: string, ecoreFiles: string[]): Promise<string> {
+        let chainResult = "";
+
+        const viewDescriptionPath = userViewPath || this.loadViewDescription();
+        const plantUmlPaths = ecoreFiles.length > 0 ? ecoreFiles : this.plantUmlFilesPaths;
+
+        if (plantUmlPaths.length === 2) {
+            chainResult = await this.llm.executeChain(viewDescriptionPath, plantUmlPaths[0], plantUmlPaths[1], "baseline");
         }
-        return true
+        return chainResult;
     }
 }

@@ -26,31 +26,31 @@ app.listen(PORT, () => {
   console.log(`Server is listening on port {PORT}`);
 });
 
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET"],
+}));
+
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-app.get("/vpdl", (req, res) => {
+app.post("/vpdl", async (req, res) => {
+  const { userViewPath, ecoreFiles } = req.body;
   const gemini = new Gemini();
   const vpdl = new VPDL(gemini);
-  if (vpdl.runVPDL()){
-    res.send("OKKK")
-  }
-  else{
-    res.send("PASOK");
-  }
-})
+  const result = await vpdl.runVPDL(userViewPath, ecoreFiles);
 
-app.get("/vpdlOpenAI", (req, res) => {
+  res.send(result);
+});
+
+app.post("/vpdlOpenAI", async (req, res) => {
+  const { userViewPath, ecoreFiles } = req.body;
   const openAI = new MyOpenAI();
   const vpdl = new VPDL(openAI);
-  if (vpdl.runVPDL()){
-    res.send("OKKK")
-  }
-  else{
-    res.send("PASOK");
-  }
-})
+  const result = await vpdl.runVPDL(userViewPath, ecoreFiles);
+  res.send(result);
+});
 
 app.post("/generate/prompt", async (req, res) => {
   const prompt = req.body.prompt;

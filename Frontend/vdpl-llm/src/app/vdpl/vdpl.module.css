@@ -1,8 +1,9 @@
 .container {
     display: flex;
     align-items: center;
-    gap: 50px;
-    margin-bottom: 20px;
+    gap: 30px;
+    margin-bottom: 5px;
+    padding-right: 50px;
 }
 
 .smallBox {
@@ -34,7 +35,7 @@
 }
 
 .bigBox {
-    width: 90%;
+    width: 70%;
     height: 35vh;
     padding: 20px;
     border-radius: 8px;
@@ -43,4 +44,29 @@
     border: 1px solid #ddd;
     margin: 20px;
     cursor: pointer;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.radioContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fafafa;
+    text-align: left;
+    border: 1px solid #ddd;
+    margin: 20px;
+
+}
+
+.radioContainer label {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.radioContainer input[type="radio"] {
+    margin-right: 5px;
 }
